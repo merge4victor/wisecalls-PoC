@@ -1,0 +1,32 @@
+{
+    "IntegrationAssociationSummaryList": [
+        {
+            "IntegrationAssociationId": "dfdca7b3-53a3-494a-b49a-d2a91d24bbda",
+            "IntegrationAssociationArn": "arn:aws:connect:ap-southeast-2:111122223333:instance/aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee/integration-association/dfdca7b3-53a3-494a-b49a-d2a91d24bbda",
+            "InstanceId": "aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee",
+            "IntegrationType": "CASES_DOMAIN",
+            "IntegrationArn": "arn:aws:cases:ap-southeast-2:111122223333:domain/0cd8a025-7049-461d-af5b-8d0e0505af3c"
+        },
+        {
+            "IntegrationAssociationId": "9e630b07-9e12-4e7c-8b54-43a2ed1a3649",
+            "IntegrationAssociationArn": "arn:aws:connect:ap-southeast-2:111122223333:instance/aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee/integration-association/9e630b07-9e12-4e7c-8b54-43a2ed1a3649",
+            "InstanceId": "aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee",
+            "IntegrationType": "WISDOM_ASSISTANT",
+            "IntegrationArn": "arn:aws:wisdom:ap-southeast-2:111122223333:assistant/7cfe1848-2fa2-4cf5-9799-40c474ec2a8f"
+        },
+        {
+            "IntegrationAssociationId": "71027b4a-1053-4abf-b35a-6324a6cacde3",
+            "IntegrationAssociationArn": "arn:aws:connect:ap-southeast-2:111122223333:instance/aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee/integration-association/71027b4a-1053-4abf-b35a-6324a6cacde3",
+            "InstanceId": "aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee",
+            "IntegrationType": "Q_MESSAGE_TEMPLATES",
+            "IntegrationArn": "arn:aws:wisdom:ap-southeast-2:111122223333:knowledge-base/a1eb70a9-c056-4c54-8b5c-716c0fe94aa1"
+        },
+        {
+            "IntegrationAssociationId": "e3cdab13-9442-441b-aee4-493659ffaacb",
+            "IntegrationAssociationArn": "arn:aws:connect:ap-southeast-2:111122223333:instance/aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee/integration-association/e3cdab13-9442-441b-aee4-493659ffaacb",
+            "InstanceId": "aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee",
+            "IntegrationType": "MESSAGE_PROCESSOR",
+            "IntegrationArn": "arn:aws:lambda:ap-southeast-2:111122223333:function:wisecalls-dev-message-processor"
+        }
+    ]
+}

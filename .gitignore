@@ -1,0 +1,17 @@
+.aws-sam/
+packaged-template.yaml
+packaged-template.json
+stack-outputs.json
+deployment-parameters.local.json
+config/customer-data.local.json
+node_modules/
+*.zip
+coverage/
+__pycache__/
+*.pyc
+frontend-deploy-*/
+ad-password-reset/infrastructure/parameters.dev.json
+claude-deploy-package/
+.claude/settings.local.json
+.claude/scheduled_tasks.lock
+.claude/worktrees/

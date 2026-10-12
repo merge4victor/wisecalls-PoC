@@ -1,0 +1,16 @@
+{
+    "ContactFlow": {
+        "Arn": "arn:aws:connect:ap-southeast-2:111122223333:instance/aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee/contact-flow/f8d79694-0e0e-47a7-8e68-86b7b81434e1",
+        "Id": "f8d79694-0e0e-47a7-8e68-86b7b81434e1",
+        "Name": "returningCallerAgentWhisper",
+        "Type": "AGENT_WHISPER",
+        "State": "ACTIVE",
+        "Status": "PUBLISHED",
+        "Description": "Whisper to inform agent that the customer is a returning customer",
+        "Content": "{\"Version\":\"2019-10-30\",\"StartAction\":\"222caecc-c107-4553-87fc-85a74c34bb06\",\"Metadata\":{\"entryPointPosition\":{\"x\":14.4,\"y\":14.4},\"ActionMetadata\":{\"95dc2179-0f18-4646-8e15-15377c9cbb29\":{\"position\":{\"x\":710.4,\"y\":208}},\"222caecc-c107-4553-87fc-85a74c34bb06\":{\"position\":{\"x\":169.6,\"y\":92.8}},\"5b3b61c2-407e-4508-b137-cf6f6679b037\":{\"position\":{\"x\":405.6,\"y\":97.6},\"parameters\":{\"LambdaFunctionARN\":{\"displayName\":\"addCustomerCalls\"},\"LambdaInvocationAttributes\":{\"acPhoneNumber\":{\"useDynamic\":true},\"acCustomerQueueName\":{\"useDynamic\":true},\"acAgentARN\":{\"useDynamic\":true},\"acCustomerQueueARN\":{\"useDynamic\":true},\"acAgentName\":{\"useDynamic\":true}}},\"dynamicMetadata\":{\"acPhoneNumber\":true,\"acCustomerQueueName\":true,\"acAgentARN\":true,\"acCustomerQueueARN\":true,\"acAgentName\":true}}},\"Annotations\":[]},\"Actions\":[{\"Parameters\":{},\"Identifier\":\"95dc2179-0f18-4646-8e15-15377c9cbb29\",\"Type\":\"EndFlowExecution\",\"Transitions\":{}},{\"Parameters\":{\"Text\":\"Customer is a returning caller. This is a query from the $.Queue.Name queue\"},\"Identifier\":\"222caecc-c107-4553-87fc-85a74c34bb06\",\"Type\":\"MessageParticipant\",\"Transitions\":{\"NextAction\":\"5b3b61c2-407e-4508-b137-cf6f6679b037\"}},{\"Parameters\":{\"LambdaFunctionARN\":\"arn:aws:lambda:ap-southeast-2:111122223333:function:addCustomerCalls\",\"InvocationTimeLimitSeconds\":\"3\",\"LambdaInvocationAttributes\":{\"acPhoneNumber\":\"$.CustomerEndpoint.Address\",\"acCustomerQueueName\":\"$.Queue.Name\",\"acAgentARN\":\"$.Agent.ARN\",\"acCustomerQueueARN\":\"$.Queue.ARN\",\"acAgentName\":\"$.Agent.UserName\"},\"ResponseValidation\":{\"ResponseType\":\"STRING_MAP\"}},\"Identifier\":\"5b3b61c2-407e-4508-b137-cf6f6679b037\",\"Type\":\"InvokeLambdaFunction\",\"Transitions\":{\"NextAction\":\"95dc2179-0f18-4646-8e15-15377c9cbb29\",\"Errors\":[{\"NextAction\":\"95dc2179-0f18-4646-8e15-15377c9cbb29\",\"ErrorType\":\"NoMatchingError\"}]}}]}",
+        "Tags": {},
+        "FlowContentSha256": "46dc10843ff2a5aa127307b16fbdfb58d04ea91dfe2931f01fcf9511beae8f91",
+        "LastModifiedTime": "2025-03-18T15:00:10.453000+11:00",
+        "LastModifiedRegion": "ap-southeast-2"
+    }
+}

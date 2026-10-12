@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#102a43">
+  <title>WiseCalls | Share your location</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="config.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="/" aria-label="WiseCalls home">
+      <span class="brand-logo">
+        <img src="assets/wisecalls_logo.jpg" alt="WiseCalls.ai">
+      </span>
+    </a>
+    <span class="secure-label"><span aria-hidden="true">●</span> Secure service</span>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="page-title">
+      <p class="eyebrow">Customer assistance</p>
+      <h1 id="page-title">Share your current location</h1>
+      <p class="intro">Send your device’s current position to the service agent helping you, then open your phone app to call WiseCalls. Your home address will not be changed.</p>
+      <div class="phone-panel">
+        <div>
+          <span class="phone-label">Call WiseCalls</span>
+          <span class="phone-help">Choose the service line you want to call.</span>
+        </div>
+        <div id="service-phone-options" class="phone-options" role="radiogroup" aria-label="WiseCalls service line">
+          <span>Loading service numbers…</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="status-title">
+      <div class="step-row">
+        <span class="step-number" aria-hidden="true">1</span>
+        <div>
+          <h2 id="status-title">Sign in securely</h2>
+          <p id="auth-description">Sign in and complete verification before sharing your location.</p>
+        </div>
+      </div>
+      <div id="auth-state" class="state" role="status" aria-live="polite">Checking sign-in status…</div>
+      <div class="actions">
+        <button id="sign-in" class="button primary" type="button" hidden>Sign in</button>
+        <button id="sign-out" class="button secondary" type="button" hidden>Sign out</button>
+      </div>
+    </section>
+
+    <section id="location-card" class="card" aria-labelledby="location-title" hidden>
+      <div class="step-row">
+        <span class="step-number" aria-hidden="true">2</span>
+        <div>
+          <h2 id="location-title">Allow one location update</h2>
+          <p>Your browser will ask for location access after you select the button below.</p>
+        </div>
+      </div>
+
+      <div class="privacy-note">
+        <h3>What will be sent</h3>
+        <ul>
+          <li>Latitude and longitude</li>
+          <li>Horizontal accuracy and observation time</li>
+          <li>Altitude and vertical accuracy, only when your device provides them</li>
+        </ul>
+        <p>The current position expires from the service after a short period. It does not replace your saved home address.</p>
+      </div>
+
+      <label class="consent">
+        <input id="consent" type="checkbox">
+        <span>I understand the purpose and consent to sharing my current approximate location for this support interaction.</span>
+      </label>
+
+      <button id="share-location" class="button primary full call-button" type="button" disabled>
+        <span aria-hidden="true">☎</span> Share location and call
+      </button>
+      <p class="call-explainer">We send the location first. After it is accepted, your phone app opens with the WiseCalls number ready to call. You remain in control of placing the call.</p>
+      <div id="location-state" class="state" role="status" aria-live="polite"></div>
+
+      <dl id="location-result" class="result" hidden>
+        <div><dt>Latitude</dt><dd id="latitude">—</dd></div>
+        <div><dt>Longitude</dt><dd id="longitude">—</dd></div>
+        <div><dt>Altitude</dt><dd id="altitude">Not supplied by device</dd></div>
+        <div><dt>Accuracy</dt><dd id="accuracy">—</dd></div>
+        <div><dt>Observed</dt><dd id="observed-at">—</dd></div>
+      </dl>
+    </section>
+
+    <noscript>
+      <p class="card error">JavaScript is required to request permission and securely send your location.</p>
+    </noscript>
+  </main>
+
+  <footer>
+    <p>Only share your location when you requested help. WiseCalls will never ask for your PIN, password, CVV or one-time security code here.</p>
+  </footer>
+</body>
+</html>

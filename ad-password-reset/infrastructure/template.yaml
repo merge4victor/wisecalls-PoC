@@ -1,0 +1,351 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: WiseCalls Amazon Connect self-service AD password-reset add-on.
+
+Parameters:
+  ProjectName:
+    Type: String
+    Default: wisecalls
+    AllowedPattern: '[a-z0-9-]+'
+  Environment:
+    Type: String
+    Default: dev
+    AllowedValues: [dev, test, prod]
+  DirectoryType:
+    Type: String
+    Default: MicrosoftAD
+    AllowedValues: [MicrosoftAD, SimpleAD]
+    Description: Use SimpleAD only in an account where AWS confirms it is available.
+  DirectoryName:
+    Type: String
+    Default: corp.wisecalls.internal
+  DirectoryShortName:
+    Type: String
+    Default: WISECALLS
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+  DirectorySubnet1:
+    Type: AWS::EC2::Subnet::Id
+  DirectorySubnet2:
+    Type: AWS::EC2::Subnet::Id
+  ConnectInstanceArn:
+    Type: String
+    AllowedPattern: 'arn:[^:]+:connect:[^:]+:[0-9]{12}:instance/.+'
+  SmsSenderId:
+    Type: String
+    Default: WiseCalls
+  OtpTtlSeconds:
+    Type: Number
+    Default: 300
+    MinValue: 120
+    MaxValue: 600
+  MaxOtpAttempts:
+    Type: Number
+    Default: 3
+    MinValue: 1
+    MaxValue: 5
+  AllowTemporaryPasswordSms:
+    Type: String
+    Default: 'true'
+    AllowedValues: ['true', 'false']
+    Description: PoC only. Keep false in production and replace with a secure password-choice portal.
+
+Rules:
+  NoTemporaryPasswordsBySmsInProduction:
+    RuleCondition: !Equals [!Ref Environment, prod]
+    Assertions:
+      - Assert: !Equals [!Ref AllowTemporaryPasswordSms, 'false']
+        AssertDescription: Production cannot deliver directory passwords through SMS.
+
+Conditions:
+  UseMicrosoftAD: !Equals [!Ref DirectoryType, MicrosoftAD]
+  UseSimpleAD: !Equals [!Ref DirectoryType, SimpleAD]
+
+Globals:
+  Function:
+    Runtime: python3.13
+    Architectures: [arm64]
+    Timeout: 15
+    MemorySize: 256
+    Tracing: Active
+    Environment:
+      Variables:
+        USER_TABLE: !Ref CustomerDirectoryTable
+        SESSION_TABLE: !Ref ResetSessionTable
+        RESET_HMAC_SECRET_ARN: !Ref ResetHmacSecret
+
+Resources:
+  DataKey:
+    Type: AWS::KMS::Key
+    Properties:
+      Description: Encrypt WiseCalls password-reset data.
+      EnableKeyRotation: true
+      KeyPolicy:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AccountAdministration
+            Effect: Allow
+            Principal: {AWS: !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:root'}
+            Action: 'kms:*'
+            Resource: '*'
+  DataKeyAlias:
+    Type: AWS::KMS::Alias
+    Properties:
+      AliasName: !Sub 'alias/${ProjectName}-${Environment}-password-reset'
+      TargetKeyId: !Ref DataKey
+
+  DirectoryAdminSecret:
+    Type: AWS::SecretsManager::Secret
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      Description: Directory Admin bootstrap credential. Rotate after provisioning.
+      KmsKeyId: !Ref DataKey
+      GenerateSecretString:
+        SecretStringTemplate: '{"username":"Admin"}'
+        GenerateStringKey: password
+        PasswordLength: 30
+        ExcludeCharacters: '"@/\\'
+        RequireEachIncludedType: true
+  ResetHmacSecret:
+    Type: AWS::SecretsManager::Secret
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      Description: Key used to HMAC registered phone numbers and OTPs.
+      KmsKeyId: !Ref DataKey
+      GenerateSecretString:
+        SecretStringTemplate: '{}'
+        GenerateStringKey: key
+        PasswordLength: 64
+        ExcludePunctuation: true
+
+  ManagedDirectory:
+    Type: AWS::DirectoryService::MicrosoftAD
+    Condition: UseMicrosoftAD
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      Edition: Standard
+      Name: !Ref DirectoryName
+      ShortName: !Ref DirectoryShortName
+      Password: !Sub '{{resolve:secretsmanager:${DirectoryAdminSecret}:SecretString:password}}'
+      CreateAlias: false
+      EnableSso: false
+      VpcSettings:
+        VpcId: !Ref VpcId
+        SubnetIds: [!Ref DirectorySubnet1, !Ref DirectorySubnet2]
+  SimpleDirectory:
+    Type: AWS::DirectoryService::SimpleAD
+    Condition: UseSimpleAD
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      Size: Small
+      Name: !Ref DirectoryName
+      ShortName: !Ref DirectoryShortName
+      Password: !Sub '{{resolve:secretsmanager:${DirectoryAdminSecret}:SecretString:password}}'
+      CreateAlias: false
+      EnableSso: false
+      VpcSettings:
+        VpcId: !Ref VpcId
+        SubnetIds: [!Ref DirectorySubnet1, !Ref DirectorySubnet2]
+
+  CustomerDirectoryTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions: [{AttributeName: phoneHash, AttributeType: S}]
+      KeySchema: [{AttributeName: phoneHash, KeyType: HASH}]
+      PointInTimeRecoverySpecification: {PointInTimeRecoveryEnabled: true}
+      SSESpecification: {SSEEnabled: true, SSEType: KMS, KMSMasterKeyId: !Ref DataKey}
+  ResetSessionTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions: [{AttributeName: sessionId, AttributeType: S}]
+      KeySchema: [{AttributeName: sessionId, KeyType: HASH}]
+      TimeToLiveSpecification: {AttributeName: expiresAt, Enabled: true}
+      SSESpecification: {SSEEnabled: true, SSEType: KMS, KMSMasterKeyId: !Ref DataKey}
+
+  IdentifyCallerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../functions
+      Handler: identify_caller.handler
+      Description: Match Amazon Connect caller number against DynamoDB and send OTP.
+      Environment:
+        Variables:
+          OTP_TTL_SECONDS: !Ref OtpTtlSeconds
+          MIN_OTP_INTERVAL_SECONDS: '60'
+          SMS_SENDER_ID: !Ref SmsSenderId
+      Policies:
+        - DynamoDBCrudPolicy: {TableName: !Ref CustomerDirectoryTable}
+        - DynamoDBCrudPolicy: {TableName: !Ref ResetSessionTable}
+        - AWSSecretsManagerGetSecretValuePolicy: {SecretArn: !Ref ResetHmacSecret}
+        - Statement:
+            - Effect: Allow
+              Action: kms:Decrypt
+              Resource: !GetAtt DataKey.Arn
+            - Effect: Allow
+              Action: sns:Publish
+              Resource: '*'
+  IdentifyCallerConnectPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref IdentifyCallerFunction
+      Principal: connect.amazonaws.com
+      SourceArn: !Ref ConnectInstanceArn
+      SourceAccount: !Ref AWS::AccountId
+  ConnectLambdaAssociation:
+    Type: AWS::Connect::IntegrationAssociation
+    Properties:
+      InstanceId: !Ref ConnectInstanceArn
+      IntegrationArn: !GetAtt IdentifyCallerFunction.Arn
+      IntegrationType: LAMBDA_FUNCTION
+
+  ResetFulfillmentFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../functions
+      Handler: reset_fulfillment.handler
+      Description: Verify Lex OTP and reset an eligible directory user password.
+      Environment:
+        Variables:
+          DIRECTORY_ID: !If [UseMicrosoftAD, !Ref ManagedDirectory, !Ref SimpleDirectory]
+          MAX_OTP_ATTEMPTS: !Ref MaxOtpAttempts
+          ALLOW_TEMP_PASSWORD_SMS: !Ref AllowTemporaryPasswordSms
+      Policies:
+        - DynamoDBCrudPolicy: {TableName: !Ref CustomerDirectoryTable}
+        - DynamoDBCrudPolicy: {TableName: !Ref ResetSessionTable}
+        - AWSSecretsManagerGetSecretValuePolicy: {SecretArn: !Ref ResetHmacSecret}
+        - Statement:
+            - Effect: Allow
+              Action: kms:Decrypt
+              Resource: !GetAtt DataKey.Arn
+            - Effect: Allow
+              Action: ds:ResetUserPassword
+              Resource: !Sub
+                - 'arn:${AWS::Partition}:ds:${AWS::Region}:${AWS::AccountId}:directory/${DirectoryId}'
+                - DirectoryId: !If [UseMicrosoftAD, !Ref ManagedDirectory, !Ref SimpleDirectory]
+            - Effect: Allow
+              Action: sns:Publish
+              Resource: '*'
+
+  LexBotRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal: {Service: lexv2.amazonaws.com}
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: LexSpeech
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: polly:SynthesizeSpeech
+                Resource: '*'
+  PasswordResetBot:
+    Type: AWS::Lex::Bot
+    Properties:
+      Name: !Sub '${ProjectName}-${Environment}-password-reset'
+      Description: Verifies a one-time code before directory password reset.
+      RoleArn: !GetAtt LexBotRole.Arn
+      DataPrivacy: {ChildDirected: false}
+      IdleSessionTTLInSeconds: 300
+      AutoBuildBotLocales: true
+      BotLocales:
+        - LocaleId: en_AU
+          Description: Australian English password reset.
+          NluConfidenceThreshold: 0.60
+          VoiceSettings: {VoiceId: Olivia}
+          SlotTypes: []
+          Intents:
+            - Name: ResetPassword
+              Description: Validate the OTP sent to the registered mobile.
+              SampleUtterances:
+                - Utterance: reset my password
+                - Utterance: my code is {VerificationCode}
+                - Utterance: verify {VerificationCode}
+              Slots:
+                - Name: VerificationCode
+                  Description: Six-digit OTP sent to the DynamoDB registered mobile.
+                  SlotTypeName: AMAZON.Number
+                  ValueElicitationSetting:
+                    SlotConstraint: Required
+                    PromptSpecification:
+                      MaxRetries: 2
+                      AllowInterrupt: true
+                      MessageGroupsList:
+                        - Message:
+                            PlainTextMessage:
+                              Value: Enter the six-digit code sent to your registered mobile.
+                  ObfuscationSetting: {ObfuscationSettingType: DefaultObfuscation}
+              SlotPriorities: [{Priority: 1, SlotName: VerificationCode}]
+              FulfillmentCodeHook: {Enabled: true}
+            - Name: FallbackIntent
+              Description: Required fallback.
+              ParentIntentSignature: AMAZON.FallbackIntent
+  PasswordResetBotVersion:
+    Type: AWS::Lex::BotVersion
+    Properties:
+      BotId: !Ref PasswordResetBot
+      Description: !Sub '${Environment} immutable bot version'
+      BotVersionLocaleSpecification:
+        - LocaleId: en_AU
+          BotVersionLocaleDetails: {SourceBotVersion: DRAFT}
+  PasswordResetBotAlias:
+    Type: AWS::Lex::BotAlias
+    Properties:
+      BotId: !Ref PasswordResetBot
+      BotAliasName: !Sub '${Environment}-connect'
+      BotVersion: !GetAtt PasswordResetBotVersion.BotVersion
+      BotAliasLocaleSettings:
+        - LocaleId: en_AU
+          BotAliasLocaleSetting:
+            Enabled: true
+            CodeHookSpecification:
+              LambdaCodeHook:
+                CodeHookInterfaceVersion: '1.0'
+                LambdaArn: !GetAtt ResetFulfillmentFunction.Arn
+  LexInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref ResetFulfillmentFunction
+      Principal: lexv2.amazonaws.com
+      SourceArn: !GetAtt PasswordResetBotAlias.Arn
+      SourceAccount: !Ref AWS::AccountId
+  ConnectLexAssociation:
+    Type: AWS::Connect::IntegrationAssociation
+    Properties:
+      InstanceId: !Ref ConnectInstanceArn
+      IntegrationArn: !GetAtt PasswordResetBotAlias.Arn
+      IntegrationType: LEX_BOT
+
+Outputs:
+  DirectoryId:
+    Value: !If [UseMicrosoftAD, !Ref ManagedDirectory, !Ref SimpleDirectory]
+  DirectoryType:
+    Value: !Ref DirectoryType
+  CustomerDirectoryTableName:
+    Value: !Ref CustomerDirectoryTable
+  ResetSessionTableName:
+    Value: !Ref ResetSessionTable
+  ResetHmacSecretArn:
+    Value: !Ref ResetHmacSecret
+  IdentifyCallerFunctionArn:
+    Value: !GetAtt IdentifyCallerFunction.Arn
+  ResetFulfillmentFunctionArn:
+    Value: !GetAtt ResetFulfillmentFunction.Arn
+  LexBotAliasArn:
+    Value: !GetAtt PasswordResetBotAlias.Arn
+  LexBotAliasId:
+    Value: !GetAtt PasswordResetBotAlias.BotAliasId

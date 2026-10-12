@@ -1,0 +1,3 @@
+# AWS Lambda Python runtimes include boto3. Pin dependencies here only if the deployment policy
+# requires vendoring a newer SDK with geo-places support.
+

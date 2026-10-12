@@ -1,0 +1,21 @@
+{
+    "ContactFlow": {
+        "Arn": "arn:aws:connect:ap-southeast-2:111122223333:instance/aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee/contact-flow/92382b30-e8c1-47ff-b060-18fcf2cf1b35",
+        "Id": "92382b30-e8c1-47ff-b060-18fcf2cf1b35",
+        "Name": "VMX3_In_Queue_Agent_Whisper_wise-calls-org",
+        "Type": "AGENT_WHISPER",
+        "State": "ACTIVE",
+        "Status": "PUBLISHED",
+        "Description": "Agent whisper flow that checks for the vmx3_flag attribute and clears it.",
+        "Content": "{\"Version\":\"2019-10-30\",\"StartAction\":\"be9713ba-488e-48aa-af95-023dc71b6ab4\",\"Metadata\":{\"entryPointPosition\":{\"x\":38.4,\"y\":153.6},\"ActionMetadata\":{\"be9713ba-488e-48aa-af95-023dc71b6ab4\":{\"position\":{\"x\":178.4,\"y\":152.8}},\"72775a1b-e1d6-491e-b153-2578ec40be70\":{\"position\":{\"x\":1281.6,\"y\":155.2}},\"Check for the vmx3_flag\":{\"position\":{\"x\":432.8,\"y\":151.2},\"isFriendlyName\":true,\"conditions\":[],\"conditionMetadata\":[{\"id\":\"d8b887c6-f8e3-41e1-b205-549afc596f5b\",\"operator\":{\"name\":\"Equals\",\"value\":\"Equals\",\"shortDisplay\":\"=\"},\"value\":\"1\"}]},\"745c8db4-4b39-4cfc-9182-b909b0ad4bda\":{\"position\":{\"x\":1001.6,\"y\":156}},\"Clear VMX3 Flag\":{\"position\":{\"x\":724,\"y\":97.6},\"isFriendlyName\":true,\"dynamicParams\":[]}},\"Annotations\":[]},\"Actions\":[{\"Parameters\":{\"FlowLoggingBehavior\":\"Enabled\"},\"Identifier\":\"be9713ba-488e-48aa-af95-023dc71b6ab4\",\"Type\":\"UpdateFlowLoggingBehavior\",\"Transitions\":{\"NextAction\":\"Check for the vmx3_flag\"}},{\"Parameters\":{},\"Identifier\":\"72775a1b-e1d6-491e-b153-2578ec40be70\",\"Type\":\"EndFlowExecution\",\"Transitions\":{}},{\"Parameters\":{\"ComparisonValue\":\"$.Attributes.vmx3_flag\"},\"Identifier\":\"Check for the vmx3_flag\",\"Type\":\"Compare\",\"Transitions\":{\"NextAction\":\"745c8db4-4b39-4cfc-9182-b909b0ad4bda\",\"Conditions\":[{\"NextAction\":\"Clear VMX3 Flag\",\"Condition\":{\"Operator\":\"Equals\",\"Operands\":[\"1\"]}}],\"Errors\":[{\"NextAction\":\"745c8db4-4b39-4cfc-9182-b909b0ad4bda\",\"ErrorType\":\"NoMatchingCondition\"}]}},{\"Parameters\":{\"Text\":\"$.Queue.Name\"},\"Identifier\":\"745c8db4-4b39-4cfc-9182-b909b0ad4bda\",\"Type\":\"MessageParticipant\",\"Transitions\":{\"NextAction\":\"72775a1b-e1d6-491e-b153-2578ec40be70\"}},{\"Parameters\":{\"Attributes\":{\"vmx3_flag\":\"0\"},\"TargetContact\":\"Current\"},\"Identifier\":\"Clear VMX3 Flag\",\"Type\":\"UpdateContactAttributes\",\"Transitions\":{\"NextAction\":\"745c8db4-4b39-4cfc-9182-b909b0ad4bda\",\"Errors\":[{\"NextAction\":\"745c8db4-4b39-4cfc-9182-b909b0ad4bda\",\"ErrorType\":\"NoMatchingError\"}]}}]}",
+        "Tags": {
+            "aws:cloudformation:stack-name": "VMX3-wise-calls-org-VMXContactFlowStack-NLKBGRYE7CT3",
+            "aws:cloudformation:logical-id": "VMXInQueueAgentWhisper",
+            "aws:cloudformation:stack-id": "arn:aws:cloudformation:ap-southeast-2:111122223333:stack/VMX3-wise-calls-org-VMXContactFlowStack-NLKBGRYE7CT3/2347e760-833b-11f1-8666-0a89e1d22499",
+            "Solution": "VMX3"
+        },
+        "FlowContentSha256": "b4a1fe59763858b41a9da579b4c653fab24ad4cb2c5bde3336bbbf1128a6b28d",
+        "LastModifiedTime": "2026-07-19T16:29:10.123000+10:00",
+        "LastModifiedRegion": "ap-southeast-2"
+    }
+}

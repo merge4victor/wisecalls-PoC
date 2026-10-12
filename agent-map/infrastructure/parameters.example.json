@@ -1,0 +1,15 @@
+[
+  { "ParameterKey": "ProjectName", "ParameterValue": "wisecalls" },
+  { "ParameterKey": "Environment", "ParameterValue": "dev" },
+  { "ParameterKey": "ConnectInstanceArn", "ParameterValue": "arn:aws:connect:ap-southeast-2:111122223333:instance/REPLACE_INSTANCE_ID" },
+  { "ParameterKey": "ConnectInstanceId", "ParameterValue": "REPLACE_INSTANCE_ID" },
+  { "ParameterKey": "CurrentLocationTableName", "ParameterValue": "REPLACE_FROM_CORE_STACK_OUTPUT" },
+  { "ParameterKey": "ToolAuditTableName", "ParameterValue": "REPLACE_FROM_CORE_STACK_OUTPUT" },
+  { "ParameterKey": "AgentOidcIssuer", "ParameterValue": "https://REPLACE_IDENTITY_ISSUER" },
+  { "ParameterKey": "AgentOidcAudience", "ParameterValue": "REPLACE_AGENT_APP_CLIENT_ID" },
+  { "ParameterKey": "AgentAuthorizationEndpoint", "ParameterValue": "https://REPLACE_IDENTITY/oauth2/authorize" },
+  { "ParameterKey": "AgentTokenEndpoint", "ParameterValue": "https://REPLACE_IDENTITY/oauth2/token" },
+  { "ParameterKey": "AgentIdClaim", "ParameterValue": "connect_user_id" },
+  { "ParameterKey": "CustomerIdContactAttribute", "ParameterValue": "customerId" },
+  { "ParameterKey": "ApplicationNamespace", "ParameterValue": "wisecalls.agent-map" }
+]

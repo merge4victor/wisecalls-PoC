@@ -1,0 +1,502 @@
+{
+  "Version": "2019-10-30",
+  "StartAction": "start-logging",
+  "Metadata": {
+    "Annotations": [
+      {
+        "type": "default",
+        "id": "note-ai-agent-voice",
+        "content": "OPTIONAL ENHANCEMENT: replace this DTMF menu with the Amazon Q in Connect AI Agent (voice conversational self-service) block. AI Agent resources already exist and are published: Public Self Service = 44c11800-b308-46c9-b2bf-a4ca6db48891 (before verification), Authenticated Self Service = 03a8ea78-c09b-41ea-b8e2-7e34b2f3d1eb (after verification). Both use assistant 7cfe1848-2fa2-4cf5-9799-40c474ec2a8f and knowledge base 1ee99728-47f1-4b3c-a0d7-0bb3bcf61384. Console step: add the AI Agent block, pick the matching agent ID, and associate the wisecalls-* flow modules as its tools. Cases lookup (get_recent_cases) additionally needs a Customer Profiles profileArn resolution step not yet built here.",
+        "actionId": "main-menu",
+        "isFolded": false
+      },
+      {
+        "type": "default",
+        "id": "note-verify",
+        "content": "Real Lambda-based verification is wired here: identify_by_phone looks up the caller's ANI in CoreDataTable (GSI1 PHONE#<e164>), start_otp_verification sends a 6-digit SMS OTP via SNS to the phone on file (90s TTL, enforced server-side in the Lambda regardless of DynamoDB's own TTL sweep timing), verify_otp checks it and only then sets customerVerified=true. NOTE: this account's SNS SMS is in sandbox mode ($1/month limit) \u2014 add real test numbers as verified sandbox destinations or request production SMS access before testing with arbitrary numbers.",
+        "actionId": "call-identify-module",
+        "isFolded": false
+      }
+    ]
+  },
+  "Actions": [
+    {
+      "Identifier": "start-logging",
+      "Type": "UpdateFlowLoggingBehavior",
+      "Parameters": {
+        "FlowLoggingBehavior": "Enabled"
+      },
+      "Transitions": {
+        "NextAction": "set-public-state"
+      }
+    },
+    {
+      "Identifier": "set-public-state",
+      "Type": "UpdateContactAttributes",
+      "Parameters": {
+        "Attributes": {
+          "customerVerified": "false",
+          "trustState": "PUBLIC",
+          "phone": "$.CustomerEndpoint.Address"
+        },
+        "TargetContact": "Current"
+      },
+      "Transitions": {
+        "NextAction": "call-identify-module",
+        "Errors": [
+          {
+            "ErrorType": "NoMatchingError",
+            "NextAction": "call-identify-module"
+          }
+        ]
+      }
+    },
+    {
+      "Identifier": "call-identify-module",
+      "Type": "InvokeFlowModule",
+      "Parameters": {
+        "FlowModuleId": "2eb549de-406f-49dd-91cf-fa8219e49cb4"
+      },
+      "Transitions": {
+        "NextAction": "check-identify-result",
+        "Errors": [
+          {
+            "ErrorType": "NoMatchingError",
+            "NextAction": "greeting-unknown"
+          }
+        ]
+      }
+    },
+    {
+      "Identifier": "check-identify-result",
+      "Type": "Compare",
+      "Parameters": {
+        "ComparisonValue": "$.Attributes.identify_found"
+      },
+      "Transitions": {
+        "NextAction": "greeting-unknown",
+        "Conditions": [
+          {
+            "NextAction": "greeting-known",
+            "Condition": {
+              "Operator": "Equals",
+              "Operands": [
+                "true"
+              ]
+            }
+          }
+        ],
+        "Errors": [
+          {
+            "ErrorType": "NoMatchingCondition",
+            "NextAction": "greeting-unknown"
+          }
+        ]
+      }
+    },
+    {
+      "Identifier": "greeting-known",
+      "Type": "MessageParticipant",
+      "Parameters": {
+        "Text": "Thanks for calling WiseCalls, $.Attributes.identify_firstName. To verify it's really you, we'll text a code to the mobile number on file."
+      },
+      "Transitions": {
+        "NextAction": "call-start-otp-module",
+        "Errors": [
+          {
+            "ErrorType": "NoMatchingError",
+            "NextAction": "main-menu"
+          }
+        ]
+      }
+    },
+    {
+      "Identifier": "call-start-otp-module",
+      "Type": "InvokeFlowModule",
+      "Parameters": {
+        "FlowModuleId": "d2b36350-dff2-4f95-a5a2-f10abbafbe90"
+      },
+      "Transitions": {
+        "NextAction": "collect-otp",
+        "Errors": [
+          {
+            "ErrorType": "NoMatchingError",
+            "NextAction": "main-menu"
+          }
+        ]
+      }
+    },
+    {
+      "Identifier": "collect-otp",
+      "Type": "GetParticipantInput",
+      "Parameters": {
+        "Text": "Please enter the 6 digit code we just texted you, then press pound. It expires in 90 seconds.",
+        "StoreInput": "True",
+        "InputTimeLimitSeconds": "90",
+        "InputValidation": {
+          "CustomValidation": {
+            "MaximumLength": "6"
+          }
+        }
+      },
+      "Transitions": {
+        "NextAction": "save-otp-input",
+        "Errors": [
+          {
+            "ErrorType": "NoMatchingError",
+            "NextAction": "main-menu"
+          }
+        ]
+      }
+    },
+    {
+      "Identifier": "save-otp-input",
+      "Type": "UpdateContactAttributes",
+      "Parameters": {
+        "Attributes": {
+          "otp_entered": "$.StoredCustomerInput"
+        },
+        "TargetContact": "Current"
+      },
+      "Transitions": {
+        "NextAction": "call-verify-otp-module",
+        "Errors": [
+          {
+            "ErrorType": "NoMatchingError",
+            "NextAction": "main-menu"
+          }
+        ]
+      }
+    },
+    {
+      "Identifier": "call-verify-otp-module",
+      "Type": "InvokeFlowModule",
+      "Parameters": {
+        "FlowModuleId": "9f61f43c-3b3c-49c8-b5b4-013064ee700e"
+      },
+      "Transitions": {
+        "NextAction": "check-verify-result",
+        "Errors": [
+          {
+            "ErrorType": "NoMatchingError",
+            "NextAction": "main-menu"
+          }
+        ]
+      }
+    },
+    {
+      "Identifier": "check-verify-result",
+      "Type": "Compare",
+      "Parameters": {
+        "ComparisonValue": "$.Attributes.otp_verified"
+      },
+      "Transitions": {
+        "NextAction": "verification-failed-message",
+        "Conditions": [
+          {
+            "NextAction": "set-verified-true",
+            "Condition": {
+              "Operator": "Equals",
+              "Operands": [
+                "true"
+              ]
+            }
+          }
+        ],
+        "Errors": [
+          {
+            "ErrorType": "NoMatchingCondition",
+            "NextAction": "verification-failed-message"
+          }
+        ]
+      }
+    },
+    {
+      "Identifier": "set-verified-true",
+      "Type": "UpdateContactAttributes",
+      "Parameters": {
+        "Attributes": {
+          "customerVerified": "true",
+          "customerId": "$.Attributes.identify_customerId"
+        },
+        "TargetContact": "Current"
+      },
+      "Transitions": {
+        "NextAction": "verified-message",
+        "Errors": [
+          {
+            "ErrorType": "NoMatchingError",
+            "NextAction": "main-menu"
+          }
+        ]
+      }
+    },
+    {
+      "Identifier": "verified-message",
+      "Type": "MessageParticipant",
+      "Parameters": {
+        "Text": "Thanks, $.Attributes.identify_firstName. You're verified."
+      },
+      "Transitions": {
+        "NextAction": "main-menu",
+        "Errors": [
+          {
+            "ErrorType": "NoMatchingError",
+            "NextAction": "main-menu"
+          }
+        ]
+      }
+    },
+    {
+      "Identifier": "verification-failed-message",
+      "Type": "MessageParticipant",
+      "Parameters": {
+        "Text": "Sorry, that code didn't match or has expired. I'll continue without verifying you for now."
+      },
+      "Transitions": {
+        "NextAction": "main-menu",
+        "Errors": [
+          {
+            "ErrorType": "NoMatchingError",
+            "NextAction": "main-menu"
+          }
+        ]
+      }
+    },
+    {
+      "Identifier": "greeting-unknown",
+      "Type": "MessageParticipant",
+      "Parameters": {
+        "Text": "Thanks for calling WiseCalls."
+      },
+      "Transitions": {
+        "NextAction": "main-menu",
+        "Errors": [
+          {
+            "ErrorType": "NoMatchingError",
+            "NextAction": "main-menu"
+          }
+        ]
+      }
+    },
+    {
+      "Identifier": "main-menu",
+      "Type": "GetParticipantInput",
+      "Parameters": {
+        "StoreInput": "False",
+        "InputTimeLimitSeconds": "8",
+        "Text": "For our current product rates, press 1. For the nearest branch or ATM, press 2. To share your location securely, press 4. To speak with an agent, press 3."
+      },
+      "Transitions": {
+        "NextAction": "invalid-input",
+        "Conditions": [
+          {
+            "NextAction": "invoke-product-rate",
+            "Condition": {
+              "Operator": "Equals",
+              "Operands": [
+                "1"
+              ]
+            }
+          },
+          {
+            "NextAction": "invoke-atm-locator",
+            "Condition": {
+              "Operator": "Equals",
+              "Operands": [
+                "2"
+              ]
+            }
+          },
+          {
+            "NextAction": "set-target-queue",
+            "Condition": {
+              "Operator": "Equals",
+              "Operands": [
+                "3"
+              ]
+            }
+          },
+          {
+            "NextAction": "call-create-location-module",
+            "Condition": {
+              "Operator": "Equals",
+              "Operands": [
+                "4"
+              ]
+            }
+          }
+        ],
+        "Errors": [
+          {
+            "ErrorType": "InputTimeLimitExceeded",
+            "NextAction": "set-target-queue"
+          },
+          {
+            "ErrorType": "NoMatchingCondition",
+            "NextAction": "invalid-input"
+          },
+          {
+            "ErrorType": "NoMatchingError",
+            "NextAction": "set-target-queue"
+          }
+        ]
+      }
+    },
+    {
+      "Identifier": "invalid-input",
+      "Type": "MessageParticipant",
+      "Parameters": {
+        "Text": "Sorry, I did not get that."
+      },
+      "Transitions": {
+        "NextAction": "main-menu",
+        "Errors": [
+          {
+            "ErrorType": "NoMatchingError",
+            "NextAction": "set-target-queue"
+          }
+        ]
+      }
+    },
+    {
+      "Identifier": "invoke-product-rate",
+      "Type": "UpdateContactAttributes",
+      "Parameters": {
+        "Attributes": {
+          "productCode": "CAR_LOAN_STANDARD"
+        },
+        "TargetContact": "Current"
+      },
+      "Transitions": {
+        "NextAction": "call-product-rate-module",
+        "Errors": [
+          {
+            "ErrorType": "NoMatchingError",
+            "NextAction": "set-target-queue"
+          }
+        ]
+      }
+    },
+    {
+      "Identifier": "call-product-rate-module",
+      "Type": "InvokeFlowModule",
+      "Parameters": {
+        "FlowModuleId": "672c33e4-d41e-4aff-ad52-a9883aff6c6e"
+      },
+      "Transitions": {
+        "NextAction": "rate-result-message",
+        "Errors": [
+          {
+            "ErrorType": "NoMatchingError",
+            "NextAction": "set-target-queue"
+          }
+        ]
+      }
+    },
+    {
+      "Identifier": "call-create-location-module",
+      "Type": "InvokeFlowModule",
+      "Parameters": {
+        "FlowModuleId": "1f300764-1c7f-4f41-9a4c-221f3f49c3c0"
+      },
+      "Transitions": {
+        "NextAction": "location-result-message",
+        "Errors": [
+          {
+            "ErrorType": "NoMatchingError",
+            "NextAction": "set-target-queue"
+          }
+        ]
+      }
+    },
+    {
+      "Identifier": "location-result-message",
+      "Type": "MessageParticipant",
+      "Parameters": {
+        "Text": "We've texted you a secure link to the mobile number on file. Open it, sign in, and grant location permission to share your current position with us."
+      },
+      "Transitions": {
+        "NextAction": "end-call",
+        "Errors": [
+          {
+            "ErrorType": "NoMatchingError",
+            "NextAction": "end-call"
+          }
+        ]
+      }
+    },
+    {
+      "Identifier": "rate-result-message",
+      "Type": "MessageParticipant",
+      "Parameters": {
+        "Text": "One moment while I retrieve the current published rate for our standard car loan product. An agent can confirm the exact figures, or this will be read by the voice AI agent once configured."
+      },
+      "Transitions": {
+        "NextAction": "end-call",
+        "Errors": [
+          {
+            "ErrorType": "NoMatchingError",
+            "NextAction": "end-call"
+          }
+        ]
+      }
+    },
+    {
+      "Identifier": "invoke-atm-locator",
+      "Type": "MessageParticipant",
+      "Parameters": {
+        "Text": "To find your nearest branch or ATM, please stay on the line and an agent will assist, or use our mobile app to share your location."
+      },
+      "Transitions": {
+        "NextAction": "end-call",
+        "Errors": [
+          {
+            "ErrorType": "NoMatchingError",
+            "NextAction": "end-call"
+          }
+        ]
+      }
+    },
+    {
+      "Identifier": "set-target-queue",
+      "Type": "UpdateContactTargetQueue",
+      "Parameters": {
+        "QueueId": "arn:aws:connect:ap-southeast-2:111122223333:instance/aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee/queue/dcc369d7-d5c2-4ee3-9a52-0d10b0219a60"
+      },
+      "Transitions": {
+        "NextAction": "escalate-to-queue",
+        "Errors": [
+          {
+            "ErrorType": "NoMatchingError",
+            "NextAction": "escalate-to-queue"
+          }
+        ]
+      }
+    },
+    {
+      "Identifier": "escalate-to-queue",
+      "Type": "TransferContactToQueue",
+      "Parameters": {},
+      "Transitions": {
+        "NextAction": "end-call",
+        "Errors": [
+          {
+            "ErrorType": "QueueAtCapacity",
+            "NextAction": "end-call"
+          },
+          {
+            "ErrorType": "NoMatchingError",
+            "NextAction": "end-call"
+          }
+        ]
+      }
+    },
+    {
+      "Identifier": "end-call",
+      "Type": "DisconnectParticipant",
+      "Parameters": {},
+      "Transitions": {}
+    }
+  ]
+}

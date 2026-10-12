@@ -1,0 +1,16 @@
+{
+    "ContactFlow": {
+        "Arn": "arn:aws:connect:ap-southeast-2:111122223333:instance/aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee/contact-flow/005ff1c3-7122-46fb-8a80-ff2ee198dff1",
+        "Id": "005ff1c3-7122-46fb-8a80-ff2ee198dff1",
+        "Name": "Default agent hold",
+        "Type": "AGENT_HOLD",
+        "State": "ACTIVE",
+        "Status": "PUBLISHED",
+        "Description": "Audio played for the agent when on hold",
+        "Content": "{\"Version\":\"2019-10-30\",\"StartAction\":\"1a34ecf3-77ff-46a7-b210-38a1a980127b\",\"Metadata\":{\"entryPointPosition\":{\"x\":75,\"y\":20},\"snapToGrid\":false,\"ActionMetadata\":{\"1a34ecf3-77ff-46a7-b210-38a1a980127b\":{\"position\":{\"x\":258,\"y\":66},\"audio\":[{\"type\":\"Text\",\"tts\":\"<speak>You are on hold <break time=\\\"10s\\\"/></speak>\",\"$$hashKey\":\"01J\",\"ttsType\":\"ssml\"}],\"timeoutUnit\":{\"display\":\"Minutes\",\"value\":\"min\"}}}},\"Actions\":[{\"Identifier\":\"1a34ecf3-77ff-46a7-b210-38a1a980127b\",\"Parameters\":{\"Messages\":[{\"SSML\":\"<speak>You are on hold <break time=\\\"10s\\\"/></speak>\"}]},\"Transitions\":{\"Errors\":[],\"Conditions\":[]},\"Type\":\"MessageParticipantIteratively\"}]}",
+        "Tags": {},
+        "FlowContentSha256": "0606386965ce16ed4c6df2b0d3d9851c0ce8758a24c3ef607f1fb87fbf023688",
+        "LastModifiedTime": "2025-02-11T11:28:00.939000+11:00",
+        "LastModifiedRegion": "ap-southeast-2"
+    }
+}

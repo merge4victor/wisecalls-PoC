@@ -1,0 +1,16 @@
+{
+  "customerId": "123456",
+  "firstName": "Alex",
+  "lastName": "Sample",
+  "phoneE164": "",
+  "homeAddress": {
+    "line1": "1 Exhibition Street",
+    "city": "Melbourne",
+    "state": "VIC",
+    "country": "Australia"
+  },
+  "directoryUserName": "alex.sample",
+  "status": "ACTIVE",
+  "passwordResetAllowed": true,
+  "privilegedAccount": false
+}

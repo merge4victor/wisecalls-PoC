@@ -1,0 +1,28 @@
+[
+  {
+    "PK": { "S": "PRODUCT#CAR_LOAN_STANDARD" },
+    "SK": { "S": "RATE#2026-07-15" },
+    "productName": { "S": "Standard secured car loan" },
+    "interestRatePa": { "S": "REPLACE_BEFORE_USE" },
+    "comparisonRatePa": { "S": "REPLACE_BEFORE_USE" },
+    "rateType": { "S": "VARIABLE" },
+    "effectiveFrom": { "S": "2026-07-15" },
+    "sourceId": { "S": "RATE-CAR-STD-20260715" },
+    "disclaimer": { "S": "Eligibility, fees and lending criteria apply. Replace with approved wording." },
+    "status": { "S": "DRAFT" }
+  },
+  {
+    "PK": { "S": "DIRECTORY#ATM" },
+    "SK": { "S": "ATM#SYDNEY-DEMO-001" },
+    "atmId": { "S": "SYDNEY-DEMO-001" },
+    "name": { "S": "DEMO ATM - DO NOT USE IN PRODUCTION" },
+    "address": { "S": "Sydney NSW 2000" },
+    "latitude": { "N": "-33.8688" },
+    "longitude": { "N": "151.2093" },
+    "openingHours": { "S": "REPLACE_BEFORE_USE" },
+    "depositCapable": { "BOOL": false },
+    "accessible": { "BOOL": false },
+    "lastVerifiedAt": { "S": "2026-07-31T00:00:00Z" },
+    "status": { "S": "DRAFT" }
+  }
+]

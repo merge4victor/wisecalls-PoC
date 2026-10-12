@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en-AU">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <title>WiseCalls Customer Location</title>
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <img src="/wisecalls_logo.jpg" alt="WiseCalls.ai" />
+        <div>
+          <h1>Customer location</h1>
+          <p>Consented, short-lived mobile GPS</p>
+        </div>
+      </header>
+
+      <section id="status-card" class="status-card" aria-live="polite">
+        <div id="status-spinner" class="spinner" aria-hidden="true"></div>
+        <div>
+          <strong id="status-title">Connecting to Amazon Connect…</strong>
+          <p id="status-message">Waiting for the active contact.</p>
+        </div>
+      </section>
+
+      <section id="auth-card" class="auth-card hidden">
+        <h2>Agent sign-in required</h2>
+        <p>Use your organisation’s agent identity. The map will only load for the agent assigned to this contact.</p>
+        <button id="sign-in" type="button">Sign in securely</button>
+      </section>
+
+      <section id="location-panel" class="location-panel hidden">
+        <div class="location-summary">
+          <div>
+            <span id="freshness" class="badge">Current</span>
+            <h2 id="approximate-label">Approximate customer location</h2>
+            <p id="observed-at"></p>
+          </div>
+          <button id="refresh" class="secondary" type="button">Refresh</button>
+        </div>
+        <div id="map" role="img" aria-label="Map showing the customer's approximate current location"></div>
+        <dl class="details">
+          <div><dt>Horizontal accuracy</dt><dd id="accuracy">—</dd></div>
+          <div><dt>Altitude</dt><dd id="altitude">Not supplied</dd></div>
+          <div><dt>Confidence</dt><dd id="confidence">—</dd></div>
+        </dl>
+        <p class="notice">Approximate, customer-consented location. Do not use GPS as proof of identity or an emergency-service-grade position.</p>
+      </section>
+    </main>
+    <script src="/config.js"></script>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,268 @@
+{
+    "ContactFlowSummaryList": [
+        {
+            "Id": "005ff1c3-7122-46fb-8a80-ff2ee198dff1",
+            "Arn": "arn:aws:connect:ap-southeast-2:111122223333:instance/aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee/contact-flow/005ff1c3-7122-46fb-8a80-ff2ee198dff1",
+            "Name": "Default agent hold",
+            "ContactFlowType": "AGENT_HOLD",
+            "ContactFlowState": "ACTIVE",
+            "ContactFlowStatus": "PUBLISHED"
+        },
+        {
+            "Id": "2c59a3a3-04db-42eb-a2cf-563f732b2cab",
+            "Arn": "arn:aws:connect:ap-southeast-2:111122223333:instance/aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee/contact-flow/2c59a3a3-04db-42eb-a2cf-563f732b2cab",
+            "Name": "Default agent transfer",
+            "ContactFlowType": "AGENT_TRANSFER",
+            "ContactFlowState": "ACTIVE",
+            "ContactFlowStatus": "PUBLISHED"
+        },
+        {
+            "Id": "f8d79694-0e0e-47a7-8e68-86b7b81434e1",
+            "Arn": "arn:aws:connect:ap-southeast-2:111122223333:instance/aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee/contact-flow/f8d79694-0e0e-47a7-8e68-86b7b81434e1",
+            "Name": "returningCallerAgentWhisper",
+            "ContactFlowType": "AGENT_WHISPER",
+            "ContactFlowState": "ACTIVE",
+            "ContactFlowStatus": "PUBLISHED"
+        },
+        {
+            "Id": "92382b30-e8c1-47ff-b060-18fcf2cf1b35",
+            "Arn": "arn:aws:connect:ap-southeast-2:111122223333:instance/aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee/contact-flow/92382b30-e8c1-47ff-b060-18fcf2cf1b35",
+            "Name": "VMX3_In_Queue_Agent_Whisper_wise-calls-org",
+            "ContactFlowType": "AGENT_WHISPER",
+            "ContactFlowState": "ACTIVE",
+            "ContactFlowStatus": "PUBLISHED"
+        },
+        {
+            "Id": "6cd5200f-75f0-4826-aac9-313378fb3299",
+            "Arn": "arn:aws:connect:ap-southeast-2:111122223333:instance/aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee/contact-flow/6cd5200f-75f0-4826-aac9-313378fb3299",
+            "Name": "newCallerAgentWhisper",
+            "ContactFlowType": "AGENT_WHISPER",
+            "ContactFlowState": "ACTIVE",
+            "ContactFlowStatus": "PUBLISHED"
+        },
+        {
+            "Id": "ea9ad722-69b9-4282-98be-3a99f1dfe29f",
+            "Arn": "arn:aws:connect:ap-southeast-2:111122223333:instance/aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee/contact-flow/ea9ad722-69b9-4282-98be-3a99f1dfe29f",
+            "Name": "Default agent whisper",
+            "ContactFlowType": "AGENT_WHISPER",
+            "ContactFlowState": "ACTIVE",
+            "ContactFlowStatus": "PUBLISHED"
+        },
+        {
+            "Id": "c99ba6ab-86bc-45d2-b6d4-6cc4791c35a4",
+            "Arn": "arn:aws:connect:ap-southeast-2:111122223333:instance/aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee/contact-flow/c99ba6ab-86bc-45d2-b6d4-6cc4791c35a4",
+            "Name": "repeatCallerFlow",
+            "ContactFlowType": "CONTACT_FLOW",
+            "ContactFlowState": "ACTIVE",
+            "ContactFlowStatus": "PUBLISHED"
+        },
+        {
+            "Id": "711efb66-c2e9-4404-89a4-da6c0c05d477",
+            "Arn": "arn:aws:connect:ap-southeast-2:111122223333:instance/aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee/contact-flow/711efb66-c2e9-4404-89a4-da6c0c05d477",
+            "Name": "VMX3_AWS_Test_Flow_wise-calls-org",
+            "ContactFlowType": "CONTACT_FLOW",
+            "ContactFlowState": "ACTIVE",
+            "ContactFlowStatus": "PUBLISHED"
+        },
+        {
+            "Id": "365f73ce-ef55-4a43-bd4b-df9d64c5a01a",
+            "Arn": "arn:aws:connect:ap-southeast-2:111122223333:instance/aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee/contact-flow/365f73ce-ef55-4a43-bd4b-df9d64c5a01a",
+            "Name": "Sample queue customer",
+            "ContactFlowType": "CONTACT_FLOW",
+            "ContactFlowState": "ACTIVE",
+            "ContactFlowStatus": "PUBLISHED"
+        },
+        {
+            "Id": "a29f6679-cb25-4604-a6e2-c8a41d0401ce",
+            "Arn": "arn:aws:connect:ap-southeast-2:111122223333:instance/aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee/contact-flow/a29f6679-cb25-4604-a6e2-c8a41d0401ce",
+            "Name": "Sample note for screenpop",
+            "ContactFlowType": "CONTACT_FLOW",
+            "ContactFlowState": "ACTIVE",
+            "ContactFlowStatus": "PUBLISHED"
+        },
+        {
+            "Id": "76ff35c3-d322-4398-80ae-4bd35800ebf8",
+            "Arn": "arn:aws:connect:ap-southeast-2:111122223333:instance/aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee/contact-flow/76ff35c3-d322-4398-80ae-4bd35800ebf8",
+            "Name": "Sample queue configurations flow",
+            "ContactFlowType": "CONTACT_FLOW",
+            "ContactFlowState": "ACTIVE",
+            "ContactFlowStatus": "PUBLISHED"
+        },
+        {
+            "Id": "05d92d19-1fc1-4540-a3f5-91dda3584ec5",
+            "Arn": "arn:aws:connect:ap-southeast-2:111122223333:instance/aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee/contact-flow/05d92d19-1fc1-4540-a3f5-91dda3584ec5",
+            "Name": "wise-calls-org-voicemail-ivr",
+            "ContactFlowType": "CONTACT_FLOW",
+            "ContactFlowState": "ACTIVE",
+            "ContactFlowStatus": "PUBLISHED"
+        },
+        {
+            "Id": "da4cb9ec-fa11-4276-b35a-fa549cab6dd5",
+            "Arn": "arn:aws:connect:ap-southeast-2:111122223333:instance/aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee/contact-flow/da4cb9ec-fa11-4276-b35a-fa549cab6dd5",
+            "Name": "Owner forward",
+            "ContactFlowType": "CONTACT_FLOW",
+            "ContactFlowState": "ACTIVE",
+            "ContactFlowStatus": "PUBLISHED"
+        },
+        {
+            "Id": "19401da3-894d-491c-8930-a3732060c4df",
+            "Arn": "arn:aws:connect:ap-southeast-2:111122223333:instance/aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee/contact-flow/19401da3-894d-491c-8930-a3732060c4df",
+            "Name": "Sample recording behavior",
+            "ContactFlowType": "CONTACT_FLOW",
+            "ContactFlowState": "ACTIVE",
+            "ContactFlowStatus": "PUBLISHED"
+        },
+        {
+            "Id": "9e1b9ca1-1b3d-425e-ae84-479e9c7728c7",
+            "Arn": "arn:aws:connect:ap-southeast-2:111122223333:instance/aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee/contact-flow/9e1b9ca1-1b3d-425e-ae84-479e9c7728c7",
+            "Name": "wisecalls-public-chat-v1-dev",
+            "ContactFlowType": "CONTACT_FLOW",
+            "ContactFlowState": "ACTIVE",
+            "ContactFlowStatus": "PUBLISHED"
+        },
+        {
+            "Id": "790c287e-1663-4dcf-844c-f180891bca52",
+            "Arn": "arn:aws:connect:ap-southeast-2:111122223333:instance/aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee/contact-flow/790c287e-1663-4dcf-844c-f180891bca52",
+            "Name": "wisecalls-voice-v1-dev",
+            "ContactFlowType": "CONTACT_FLOW",
+            "ContactFlowState": "ACTIVE",
+            "ContactFlowStatus": "PUBLISHED"
+        },
+        {
+            "Id": "0ec80f32-0c13-4067-b9d9-6a40ccf0e99a",
+            "Arn": "arn:aws:connect:ap-southeast-2:111122223333:instance/aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee/contact-flow/0ec80f32-0c13-4067-b9d9-6a40ccf0e99a",
+            "Name": "VMX3_Guided_Task_Flow_wise-calls-org",
+            "ContactFlowType": "CONTACT_FLOW",
+            "ContactFlowState": "ACTIVE",
+            "ContactFlowStatus": "PUBLISHED"
+        },
+        {
+            "Id": "62e04b29-aca1-4f38-9294-fa45d3540b90",
+            "Arn": "arn:aws:connect:ap-southeast-2:111122223333:instance/aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee/contact-flow/62e04b29-aca1-4f38-9294-fa45d3540b90",
+            "Name": "Sample AB test",
+            "ContactFlowType": "CONTACT_FLOW",
+            "ContactFlowState": "ACTIVE",
+            "ContactFlowStatus": "PUBLISHED"
+        },
+        {
+            "Id": "8d0fa506-dd84-4b10-b612-d0ab36c2f344",
+            "Arn": "arn:aws:connect:ap-southeast-2:111122223333:instance/aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee/contact-flow/8d0fa506-dd84-4b10-b612-d0ab36c2f344",
+            "Name": "Sample inbound flow (first contact experience)",
+            "ContactFlowType": "CONTACT_FLOW",
+            "ContactFlowState": "ACTIVE",
+            "ContactFlowStatus": "PUBLISHED"
+        },
+        {
+            "Id": "3d092558-8d54-4a76-a9f0-acfb4ca18d4d",
+            "Arn": "arn:aws:connect:ap-southeast-2:111122223333:instance/aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee/contact-flow/3d092558-8d54-4a76-a9f0-acfb4ca18d4d",
+            "Name": "Sample disconnect flow",
+            "ContactFlowType": "CONTACT_FLOW",
+            "ContactFlowState": "ACTIVE",
+            "ContactFlowStatus": "PUBLISHED"
+        },
+        {
+            "Id": "e2d9be34-bffc-442b-81b4-5bcd871df20a",
+            "Arn": "arn:aws:connect:ap-southeast-2:111122223333:instance/aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee/contact-flow/e2d9be34-bffc-442b-81b4-5bcd871df20a",
+            "Name": "VMX3_Guided_Task_Agent_Flow_wise-calls-org",
+            "ContactFlowType": "CONTACT_FLOW",
+            "ContactFlowState": "ACTIVE",
+            "ContactFlowStatus": "PUBLISHED"
+        },
+        {
+            "Id": "5912564f-e5ed-4ae6-ba96-4a9f03006e8d",
+            "Arn": "arn:aws:connect:ap-southeast-2:111122223333:instance/aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee/contact-flow/5912564f-e5ed-4ae6-ba96-4a9f03006e8d",
+            "Name": "Sample Lambda integration",
+            "ContactFlowType": "CONTACT_FLOW",
+            "ContactFlowState": "ACTIVE",
+            "ContactFlowStatus": "PUBLISHED"
+        },
+        {
+            "Id": "16468b83-312b-4c3b-91fe-8932c39d5f06",
+            "Arn": "arn:aws:connect:ap-southeast-2:111122223333:instance/aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee/contact-flow/16468b83-312b-4c3b-91fe-8932c39d5f06",
+            "Name": "main_menu",
+            "ContactFlowType": "CONTACT_FLOW",
+            "ContactFlowState": "ACTIVE",
+            "ContactFlowStatus": "PUBLISHED"
+        },
+        {
+            "Id": "48a36ef3-3e3e-4410-899b-b8a62ba869ae",
+            "Arn": "arn:aws:connect:ap-southeast-2:111122223333:instance/aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee/contact-flow/48a36ef3-3e3e-4410-899b-b8a62ba869ae",
+            "Name": "Sample secure input with no agent",
+            "ContactFlowType": "CONTACT_FLOW",
+            "ContactFlowState": "ACTIVE",
+            "ContactFlowStatus": "PUBLISHED"
+        },
+        {
+            "Id": "9635ff3c-a00b-4d02-9af5-3df8a6122a14",
+            "Arn": "arn:aws:connect:ap-southeast-2:111122223333:instance/aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee/contact-flow/9635ff3c-a00b-4d02-9af5-3df8a6122a14",
+            "Name": "Default customer hold",
+            "ContactFlowType": "CUSTOMER_HOLD",
+            "ContactFlowState": "ACTIVE",
+            "ContactFlowStatus": "PUBLISHED"
+        },
+        {
+            "Id": "6f1b900b-6876-4f32-a393-1e76572bb725",
+            "Arn": "arn:aws:connect:ap-southeast-2:111122223333:instance/aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee/contact-flow/6f1b900b-6876-4f32-a393-1e76572bb725",
+            "Name": "Sample interruptible queue flow with callback",
+            "ContactFlowType": "CUSTOMER_QUEUE",
+            "ContactFlowState": "ACTIVE",
+            "ContactFlowStatus": "PUBLISHED"
+        },
+        {
+            "Id": "a9a79f8d-9920-4f66-8f1c-f2e2a81c07bf",
+            "Arn": "arn:aws:connect:ap-southeast-2:111122223333:instance/aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee/contact-flow/a9a79f8d-9920-4f66-8f1c-f2e2a81c07bf",
+            "Name": "VMX3_In_Queue_Option_wise-calls-org",
+            "ContactFlowType": "CUSTOMER_QUEUE",
+            "ContactFlowState": "ACTIVE",
+            "ContactFlowStatus": "PUBLISHED"
+        },
+        {
+            "Id": "47a66485-c943-4f6b-8fe1-8a792d7fb141",
+            "Arn": "arn:aws:connect:ap-southeast-2:111122223333:instance/aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee/contact-flow/47a66485-c943-4f6b-8fe1-8a792d7fb141",
+            "Name": "Default customer queue",
+            "ContactFlowType": "CUSTOMER_QUEUE",
+            "ContactFlowState": "ACTIVE",
+            "ContactFlowStatus": "PUBLISHED"
+        },
+        {
+            "Id": "58ba999d-d76b-4cf1-ace2-2fc62c4fa07d",
+            "Arn": "arn:aws:connect:ap-southeast-2:111122223333:instance/aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee/contact-flow/58ba999d-d76b-4cf1-ace2-2fc62c4fa07d",
+            "Name": "VMX3_In_Queue_Customer_Whisper_wise-calls-org",
+            "ContactFlowType": "CUSTOMER_WHISPER",
+            "ContactFlowState": "ACTIVE",
+            "ContactFlowStatus": "PUBLISHED"
+        },
+        {
+            "Id": "3246dd3e-bfab-414a-923c-47319b3e318e",
+            "Arn": "arn:aws:connect:ap-southeast-2:111122223333:instance/aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee/contact-flow/3246dd3e-bfab-414a-923c-47319b3e318e",
+            "Name": "Default customer whisper",
+            "ContactFlowType": "CUSTOMER_WHISPER",
+            "ContactFlowState": "ACTIVE",
+            "ContactFlowStatus": "PUBLISHED"
+        },
+        {
+            "Id": "f38ec66a-e27c-4bea-a2b7-c5f42acc625c",
+            "Arn": "arn:aws:connect:ap-southeast-2:111122223333:instance/aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee/contact-flow/f38ec66a-e27c-4bea-a2b7-c5f42acc625c",
+            "Name": "Default outbound",
+            "ContactFlowType": "OUTBOUND_WHISPER",
+            "ContactFlowState": "ACTIVE",
+            "ContactFlowStatus": "PUBLISHED"
+        },
+        {
+            "Id": "82766905-72ef-459a-841d-791f54cf2b89",
+            "Arn": "arn:aws:connect:ap-southeast-2:111122223333:instance/aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee/contact-flow/82766905-72ef-459a-841d-791f54cf2b89",
+            "Name": "Sample secure input with agent",
+            "ContactFlowType": "QUEUE_TRANSFER",
+            "ContactFlowState": "ACTIVE",
+            "ContactFlowStatus": "PUBLISHED"
+        },
+        {
+            "Id": "45dd1e92-7677-43e1-a30a-58759b15ebc9",
+            "Arn": "arn:aws:connect:ap-southeast-2:111122223333:instance/aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee/contact-flow/45dd1e92-7677-43e1-a30a-58759b15ebc9",
+            "Name": "Default queue transfer",
+            "ContactFlowType": "QUEUE_TRANSFER",
+            "ContactFlowState": "ACTIVE",
+            "ContactFlowStatus": "PUBLISHED"
+        }
+    ]
+}

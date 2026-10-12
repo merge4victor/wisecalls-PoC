@@ -1,0 +1,13 @@
+[
+  {"ParameterKey":"ProjectName","ParameterValue":"wisecalls"},
+  {"ParameterKey":"Environment","ParameterValue":"dev"},
+  {"ParameterKey":"DirectoryType","ParameterValue":"MicrosoftAD"},
+  {"ParameterKey":"DirectoryName","ParameterValue":"corp.wisecalls.internal"},
+  {"ParameterKey":"DirectoryShortName","ParameterValue":"WISECALLS"},
+  {"ParameterKey":"VpcId","ParameterValue":"vpc-REPLACE"},
+  {"ParameterKey":"DirectorySubnet1","ParameterValue":"subnet-REPLACE_AZ1"},
+  {"ParameterKey":"DirectorySubnet2","ParameterValue":"subnet-REPLACE_AZ2"},
+  {"ParameterKey":"ConnectInstanceArn","ParameterValue":"arn:aws:connect:ap-southeast-2:123456789012:instance/REPLACE"},
+  {"ParameterKey":"SmsSenderId","ParameterValue":"WiseCalls"},
+  {"ParameterKey":"AllowTemporaryPasswordSms","ParameterValue":"true"}
+]

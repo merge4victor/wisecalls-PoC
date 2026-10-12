@@ -1,0 +1,73 @@
+{
+  "Version": "2019-10-30",
+  "StartAction": "start-logging",
+  "Metadata": {
+    "Annotations": [
+      {
+        "type": "default",
+        "id": "note-purpose",
+        "content": "Outbound-only flow: runs once the customer answers a scheduled-callback call placed by callback-poller via StartOutboundVoiceContact. Never assigned to an inbound number. See docs/superpowers/specs/2026-08-02-scheduled-callback-design.md.",
+        "actionId": "start-logging",
+        "isFolded": false
+      }
+    ]
+  },
+  "Actions": [
+    {
+      "Identifier": "start-logging",
+      "Type": "UpdateFlowLoggingBehavior",
+      "Parameters": { "FlowLoggingBehavior": "Enabled" },
+      "Transitions": { "NextAction": "set-olivia-voice" }
+    },
+    {
+      "Identifier": "set-olivia-voice",
+      "Type": "UpdateContactTextToSpeechVoice",
+      "Parameters": {
+        "TextToSpeechVoice": "Olivia",
+        "TextToSpeechEngine": "neural"
+      },
+      "Transitions": {
+        "NextAction": "greeting",
+        "Errors": [ { "ErrorType": "NoMatchingError", "NextAction": "greeting" } ]
+      }
+    },
+    {
+      "Identifier": "greeting",
+      "Type": "MessageParticipant",
+      "Parameters": { "Text": "Hello, this is __ORG_NAME__ returning your scheduled callback. One moment while I connect you." },
+      "Transitions": {
+        "NextAction": "set-target-queue",
+        "Errors": [ { "ErrorType": "NoMatchingError", "NextAction": "set-target-queue" } ]
+      }
+    },
+    {
+      "Identifier": "set-target-queue",
+      "Type": "UpdateContactTargetQueue",
+      "Parameters": {
+        "QueueId": "arn:aws:connect:ap-southeast-2:111122223333:instance/aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee/queue/dcc369d7-d5c2-4ee3-9a52-0d10b0219a60"
+      },
+      "Transitions": {
+        "NextAction": "escalate-to-queue",
+        "Errors": [ { "ErrorType": "NoMatchingError", "NextAction": "escalate-to-queue" } ]
+      }
+    },
+    {
+      "Identifier": "escalate-to-queue",
+      "Type": "TransferContactToQueue",
+      "Parameters": {},
+      "Transitions": {
+        "NextAction": "end-call",
+        "Errors": [
+          { "ErrorType": "QueueAtCapacity", "NextAction": "end-call" },
+          { "ErrorType": "NoMatchingError", "NextAction": "end-call" }
+        ]
+      }
+    },
+    {
+      "Identifier": "end-call",
+      "Type": "DisconnectParticipant",
+      "Parameters": {},
+      "Transitions": {}
+    }
+  ]
+}

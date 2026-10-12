@@ -1,0 +1,16 @@
+{
+    "ContactFlow": {
+        "Arn": "arn:aws:connect:ap-southeast-2:111122223333:instance/aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee/contact-flow/da4cb9ec-fa11-4276-b35a-fa549cab6dd5",
+        "Id": "da4cb9ec-fa11-4276-b35a-fa549cab6dd5",
+        "Name": "Owner forward",
+        "Type": "CONTACT_FLOW",
+        "State": "ACTIVE",
+        "Status": "PUBLISHED",
+        "Description": "",
+        "Content": "{\"Version\":\"2019-10-30\",\"StartAction\":\"welcome\",\"Metadata\":{\"entryPointPosition\":{\"x\":40,\"y\":40},\"ActionMetadata\":{\"6d16400c-8237-4f99-b312-9d7935d26399\":{\"position\":{\"x\":1014.4,\"y\":304}},\"sorry\":{\"position\":{\"x\":788.8,\"y\":204.8},\"isFriendlyName\":true},\"transfer to owner\":{\"position\":{\"x\":570.4,\"y\":41.6},\"isFriendlyName\":true,\"parameters\":{\"ThirdPartyPhoneNumber\":{\"countryCode\":\"AU\"}},\"CountryCode\":\"au\"},\"welcome\":{\"position\":{\"x\":200.8,\"y\":65.6},\"isFriendlyName\":true,\"parameters\":{\"PromptId\":{\"displayName\":\"thanks_for_calling\"}},\"promptName\":\"thanks_for_calling\"},\"transferring_prompt\":{\"position\":{\"x\":413.6,\"y\":249.6},\"isFriendlyName\":true}},\"Annotations\":[]},\"Actions\":[{\"Parameters\":{},\"Identifier\":\"6d16400c-8237-4f99-b312-9d7935d26399\",\"Type\":\"DisconnectParticipant\",\"Transitions\":{}},{\"Parameters\":{\"Text\":\"Sorry. Error occured while tranferring your call. We will call you back shortly. have a great day \"},\"Identifier\":\"sorry\",\"Type\":\"MessageParticipant\",\"Transitions\":{\"NextAction\":\"6d16400c-8237-4f99-b312-9d7935d26399\",\"Errors\":[{\"NextAction\":\"6d16400c-8237-4f99-b312-9d7935d26399\",\"ErrorType\":\"NoMatchingError\"}]}},{\"Parameters\":{\"ThirdPartyPhoneNumber\":\"+61491570156\",\"ThirdPartyConnectionTimeLimitSeconds\":\"10\",\"ContinueFlowExecution\":\"False\"},\"Identifier\":\"transfer to owner\",\"Type\":\"TransferParticipantToThirdParty\",\"Transitions\":{\"NextAction\":\"sorry\",\"Errors\":[{\"NextAction\":\"sorry\",\"ErrorType\":\"NoMatchingError\"}]}},{\"Parameters\":{\"SkipWhenDTMFBufferEnabled\":\"false\",\"PromptId\":\"arn:aws:connect:ap-southeast-2:111122223333:instance/aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee/prompt/66e72b79-5c20-4c72-aa86-491a7eef9cfd\"},\"Identifier\":\"welcome\",\"Type\":\"MessageParticipant\",\"Transitions\":{\"NextAction\":\"transferring_prompt\",\"Errors\":[{\"NextAction\":\"sorry\",\"ErrorType\":\"NoMatchingError\"}]}},{\"Parameters\":{\"SkipWhenDTMFBufferEnabled\":\"false\",\"SSML\":\"<speak>\\n  Transferring your call to one of our agents now. <break strength=\\\"strong\\\"/>\\n  Please hold while we connect you<break strength=\\\"weak\\\"/>, this shouldn't take long.\\n</speak>\"},\"Identifier\":\"transferring_prompt\",\"Type\":\"MessageParticipant\",\"Transitions\":{\"NextAction\":\"transfer to owner\",\"Errors\":[{\"NextAction\":\"sorry\",\"ErrorType\":\"NoMatchingError\"}]}}]}",
+        "Tags": {},
+        "FlowContentSha256": "6457c0807f34db64c170d1f5ae4263e3e2f6a4732df79b672594690413404d1b",
+        "LastModifiedTime": "2026-07-19T15:52:10.507000+10:00",
+        "LastModifiedRegion": "ap-southeast-2"
+    }
+}

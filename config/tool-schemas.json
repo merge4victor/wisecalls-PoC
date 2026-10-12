@@ -1,0 +1,80 @@
+{
+  "get_product_rate": {
+    "authentication": "PUBLIC",
+    "lambdaOutput": "ProductRatesFunctionArn",
+    "inputSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["productCode"],
+      "properties": {
+        "productCode": {
+          "type": "string",
+          "enum": ["CAR_LOAN_STANDARD"]
+        },
+        "asOf": {
+          "type": "string",
+          "format": "date"
+        }
+      }
+    }
+  },
+  "find_nearest_atms": {
+    "authentication": "PUBLIC_WITH_LOCATION_CONSENT",
+    "lambdaOutput": "AtmLocatorFunctionArn",
+    "inputSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["latitude", "longitude"],
+      "properties": {
+        "latitude": { "type": "number", "minimum": -90, "maximum": 90 },
+        "longitude": { "type": "number", "minimum": -180, "maximum": 180 },
+        "radiusKm": { "type": "number", "minimum": 1, "maximum": 100, "default": 25 },
+        "depositRequired": { "type": "boolean", "default": false },
+        "accessibilityRequired": { "type": "boolean", "default": false },
+        "limit": { "type": "integer", "minimum": 1, "maximum": 5, "default": 3 }
+      }
+    }
+  },
+  "get_customer_context": {
+    "authentication": "MFA_REQUIRED",
+    "lambdaOutput": "CustomerContextFunctionArn",
+    "trustedOverrides": ["customerId", "customerVerified", "contactId"],
+    "inputSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {}
+    }
+  },
+  "get_recent_cases": {
+    "authentication": "MFA_REQUIRED",
+    "lambdaOutput": "CasesContextFunctionArn",
+    "trustedOverrides": ["profileArn", "customerVerified", "contactId"],
+    "inputSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "commentLimit": { "type": "integer", "minimum": 1, "maximum": 5, "default": 3 }
+      }
+    }
+  },
+  "create_location_session": {
+    "authentication": "EXPLICIT_CONSENT_REQUIRED",
+    "lambdaOutput": "LocationSessionFunctionArn",
+    "trustedOverrides": ["action", "contactId", "customerId"],
+    "inputSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {}
+    }
+  },
+  "get_current_location": {
+    "authentication": "MFA_REQUIRED_AND_LOCATION_CONSENTED",
+    "lambdaOutput": "LocationSessionFunctionArn",
+    "trustedOverrides": ["action", "customerId", "customerVerified", "contactId"],
+    "inputSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {}
+    }
+  }
+}

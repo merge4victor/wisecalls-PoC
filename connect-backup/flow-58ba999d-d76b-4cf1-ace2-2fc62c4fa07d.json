@@ -1,0 +1,21 @@
+{
+    "ContactFlow": {
+        "Arn": "arn:aws:connect:ap-southeast-2:111122223333:instance/aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee/contact-flow/58ba999d-d76b-4cf1-ace2-2fc62c4fa07d",
+        "Id": "58ba999d-d76b-4cf1-ace2-2fc62c4fa07d",
+        "Name": "VMX3_In_Queue_Customer_Whisper_wise-calls-org",
+        "Type": "CUSTOMER_WHISPER",
+        "State": "ACTIVE",
+        "Status": "PUBLISHED",
+        "Description": "Provides a customer interrupt experience when using in-queue voicemail.",
+        "Content": "{\"Version\":\"2019-10-30\",\"StartAction\":\"Enable logging\",\"Metadata\":{\"entryPointPosition\":{\"x\":40,\"y\":40},\"ActionMetadata\":{\"74ac7126-532c-4f26-82ac-3101e25d74c9\":{\"position\":{\"x\":646.4,\"y\":182.4}},\"Enable logging\":{\"position\":{\"x\":143.2,\"y\":181.6},\"isFriendlyName\":true},\"Play interrupt message\":{\"position\":{\"x\":403.2,\"y\":180.8},\"isFriendlyName\":true}},\"Annotations\":[]},\"Actions\":[{\"Parameters\":{},\"Identifier\":\"74ac7126-532c-4f26-82ac-3101e25d74c9\",\"Type\":\"EndFlowExecution\",\"Transitions\":{}},{\"Parameters\":{\"FlowLoggingBehavior\":\"Enabled\"},\"Identifier\":\"Enable logging\",\"Type\":\"UpdateFlowLoggingBehavior\",\"Transitions\":{\"NextAction\":\"Play interrupt message\"}},{\"Parameters\":{\"Text\":\"While you were leaving your voicemail, an agent became available. Ending voicemail recording and connecting you now.\"},\"Identifier\":\"Play interrupt message\",\"Type\":\"MessageParticipant\",\"Transitions\":{\"NextAction\":\"74ac7126-532c-4f26-82ac-3101e25d74c9\"}}]}",
+        "Tags": {
+            "aws:cloudformation:stack-name": "VMX3-wise-calls-org-VMXContactFlowStack-NLKBGRYE7CT3",
+            "aws:cloudformation:logical-id": "VMXInQueueCustomerWhisper",
+            "aws:cloudformation:stack-id": "arn:aws:cloudformation:ap-southeast-2:111122223333:stack/VMX3-wise-calls-org-VMXContactFlowStack-NLKBGRYE7CT3/2347e760-833b-11f1-8666-0a89e1d22499",
+            "Solution": "VMX3"
+        },
+        "FlowContentSha256": "2111131b4cbf2607c6cfb4e475ba503020dbd7eb5b5b37806718075feffb0b8a",
+        "LastModifiedTime": "2026-07-19T16:29:14.553000+10:00",
+        "LastModifiedRegion": "ap-southeast-2"
+    }
+}

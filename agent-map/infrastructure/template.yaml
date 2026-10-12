@@ -1,0 +1,318 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: WiseCalls contact-scoped customer location map for the Amazon Connect Agent Workspace.
+
+Parameters:
+  ProjectName:
+    Type: String
+    Default: wisecalls
+    AllowedPattern: "^[a-z][a-z0-9-]{2,39}$"
+  Environment:
+    Type: String
+    Default: dev
+    AllowedValues: [dev, test, prod]
+  ConnectInstanceArn:
+    Type: String
+    Description: ARN of the existing Amazon Connect instance.
+    AllowedPattern: "^arn:aws[-a-z0-9]*:connect:[-a-z0-9]*:[0-9]{12}:instance/[-a-zA-Z0-9]*$"
+  ConnectInstanceId:
+    Type: String
+    Description: Final instance ID component from ConnectInstanceArn.
+    MinLength: 1
+    MaxLength: 100
+  CurrentLocationTableName:
+    Type: String
+    Description: Existing short-lived current GPS table created by the core WiseCalls stack.
+  ToolAuditTableName:
+    Type: String
+    Description: Existing audit table created by the core WiseCalls stack.
+  AgentOidcIssuer:
+    Type: String
+    Description: HTTPS OIDC issuer used to authenticate agents.
+    AllowedPattern: "^https://.+[^/]$"
+  AgentOidcAudience:
+    Type: String
+    Description: OAuth/OIDC client ID or API audience accepted by API Gateway.
+    NoEcho: true
+  AgentAuthorizationEndpoint:
+    Type: String
+    Description: OIDC authorization endpoint used by the browser PKCE flow.
+    AllowedPattern: "^https://.+$"
+  AgentTokenEndpoint:
+    Type: String
+    Description: OIDC token endpoint; it must allow requests from the agent-map origin.
+    AllowedPattern: "^https://.+$"
+  AgentIdClaim:
+    Type: String
+    Default: connect_user_id
+    Description: JWT claim containing the Connect user ID or agent ARN.
+    AllowedPattern: "^[A-Za-z0-9:_-]{1,128}$"
+  CustomerIdContactAttribute:
+    Type: String
+    Default: customerId
+    Description: Trusted contact attribute populated after customer verification.
+    AllowedPattern: "^[A-Za-z0-9_-]{1,128}$"
+  ApplicationNamespace:
+    Type: String
+    Default: wisecalls.agent-map
+    AllowedPattern: "^[a-zA-Z0-9/._-]+$"
+
+Globals:
+  Function:
+    Runtime: python3.13
+    Architectures: [arm64]
+    MemorySize: 256
+    Timeout: 8
+    Tracing: Active
+    Tags:
+      Project: !Ref ProjectName
+      Environment: !Ref Environment
+      DataClassification: Restricted
+
+Resources:
+  AgentMapFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal: { Service: lambda.amazonaws.com }
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess
+      Policies:
+        - PolicyName: ReadAssignedContactLocation
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Sid: DescribeContact
+                Effect: Allow
+                Action: connect:DescribeContact
+                Resource: "*"
+              - Sid: ReadCurrentLocation
+                Effect: Allow
+                Action: dynamodb:GetItem
+                Resource: !Sub "arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${CurrentLocationTableName}"
+              - Sid: WriteRedactedAudit
+                Effect: Allow
+                Action: dynamodb:PutItem
+                Resource: !Sub "arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${ToolAuditTableName}"
+              - Sid: ApproximatePlaceDescription
+                Effect: Allow
+                Action:
+                  - geo-places:ReverseGeocode
+                  - geo-places:SearchNearby
+                Resource: !Sub "arn:${AWS::Partition}:geo-places:${AWS::Region}::provider/default"
+
+  AgentMapFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../backend/
+      Handler: app.handler
+      Role: !GetAtt AgentMapFunctionRole.Arn
+      Environment:
+        Variables:
+          CONNECT_INSTANCE_ID: !Ref ConnectInstanceId
+          CURRENT_LOCATION_TABLE: !Ref CurrentLocationTableName
+          AUDIT_TABLE: !Ref ToolAuditTableName
+          AGENT_ID_CLAIM: !Ref AgentIdClaim
+          CUSTOMER_ID_ATTRIBUTE: !Ref CustomerIdContactAttribute
+          AUDIT_TTL_DAYS: "365"
+      Events:
+        GetCurrentLocation:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref AgentMapApi
+            Path: /agent/location
+            Method: GET
+
+  AgentMapApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: !Ref Environment
+      CorsConfiguration:
+        AllowOrigins:
+          - !Sub "https://${AgentMapDistribution.DomainName}"
+        AllowHeaders: [authorization, content-type]
+        AllowMethods: [GET, OPTIONS]
+        MaxAge: 300
+      Auth:
+        DefaultAuthorizer: AgentOidcJwt
+        Authorizers:
+          AgentOidcJwt:
+            IdentitySource: "$request.header.Authorization"
+            JwtConfiguration:
+              audience: [!Ref AgentOidcAudience]
+              issuer: !Ref AgentOidcIssuer
+
+  AgentMapBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault: { SSEAlgorithm: AES256 }
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        IgnorePublicAcls: true
+        BlockPublicPolicy: true
+        RestrictPublicBuckets: true
+      VersioningConfiguration: { Status: Enabled }
+      OwnershipControls:
+        Rules: [{ ObjectOwnership: BucketOwnerEnforced }]
+      Tags:
+        - { Key: Project, Value: !Ref ProjectName }
+        - { Key: Environment, Value: !Ref Environment }
+        - { Key: DataClassification, Value: PrivateApplicationCode }
+
+  AgentMapOriginAccessControl:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Name: !Sub "${ProjectName}-${Environment}-agent-map-oac"
+        Description: Signed CloudFront access to the private agent map bucket.
+        OriginAccessControlOriginType: s3
+        SigningBehavior: always
+        SigningProtocol: sigv4
+
+  AgentMapSecurityHeaders:
+    Type: AWS::CloudFront::ResponseHeadersPolicy
+    Properties:
+      ResponseHeadersPolicyConfig:
+        Name: !Sub "${ProjectName}-${Environment}-agent-map-security"
+        Comment: Security headers that permit embedding only in Amazon Connect workspaces.
+        SecurityHeadersConfig:
+          ContentSecurityPolicy:
+            Override: true
+            ContentSecurityPolicy: !Sub >-
+              default-src 'self';
+              script-src 'self';
+              style-src 'self' 'unsafe-inline';
+              img-src 'self' data: blob: https://maps.geo.${AWS::Region}.amazonaws.com;
+              connect-src 'self' https://*.execute-api.${AWS::Region}.amazonaws.com https://maps.geo.${AWS::Region}.amazonaws.com ${AgentTokenEndpoint};
+              worker-src 'self' blob:;
+              child-src 'self' blob:;
+              object-src 'none';
+              base-uri 'none';
+              frame-ancestors https://*.my.connect.aws https://*.awsapps.com;
+          ContentTypeOptions: { Override: true }
+          ReferrerPolicy:
+            Override: true
+            ReferrerPolicy: strict-origin-when-cross-origin
+          StrictTransportSecurity:
+            AccessControlMaxAgeSec: 63072000
+            IncludeSubdomains: true
+            Preload: true
+            Override: true
+
+  AgentMapDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Enabled: true
+        HttpVersion: http2and3
+        IPV6Enabled: true
+        DefaultRootObject: index.html
+        Origins:
+          - Id: AgentMapS3Origin
+            DomainName: !GetAtt AgentMapBucket.RegionalDomainName
+            OriginAccessControlId: !Ref AgentMapOriginAccessControl
+            S3OriginConfig: { OriginAccessIdentity: "" }
+        DefaultCacheBehavior:
+          TargetOriginId: AgentMapS3Origin
+          ViewerProtocolPolicy: redirect-to-https
+          AllowedMethods: [GET, HEAD, OPTIONS]
+          CachedMethods: [GET, HEAD, OPTIONS]
+          Compress: true
+          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6
+          ResponseHeadersPolicyId: !Ref AgentMapSecurityHeaders
+        PriceClass: PriceClass_100
+      Tags:
+        - { Key: Project, Value: !Ref ProjectName }
+        - { Key: Environment, Value: !Ref Environment }
+
+  AgentMapBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref AgentMapBucket
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: DenyInsecureTransport
+            Effect: Deny
+            Principal: "*"
+            Action: s3:*
+            Resource:
+              - !GetAtt AgentMapBucket.Arn
+              - !Sub "${AgentMapBucket.Arn}/*"
+            Condition: { Bool: { "aws:SecureTransport": "false" } }
+          - Sid: AllowCloudFrontRead
+            Effect: Allow
+            Principal: { Service: cloudfront.amazonaws.com }
+            Action: s3:GetObject
+            Resource: !Sub "${AgentMapBucket.Arn}/*"
+            Condition:
+              StringEquals:
+                "AWS:SourceArn": !Sub "arn:${AWS::Partition}:cloudfront::${AWS::AccountId}:distribution/${AgentMapDistribution}"
+
+  AgentMapApiKey:
+    Type: AWS::Location::APIKey
+    Properties:
+      KeyName: !Sub "${ProjectName}-${Environment}-agent-map"
+      Description: Browser map tiles only; restricted to the WiseCalls agent-map CloudFront origin.
+      NoExpiry: true
+      ForceUpdate: true
+      Restrictions:
+        AllowActions: ["geo-maps:Get*"]
+        AllowResources:
+          - !Sub "arn:${AWS::Partition}:geo-maps:${AWS::Region}::provider/default"
+        AllowReferers:
+          - !Sub "https://${AgentMapDistribution.DomainName}/*"
+      Tags:
+        - { Key: Project, Value: !Ref ProjectName }
+        - { Key: Environment, Value: !Ref Environment }
+
+  AgentWorkspaceApplication:
+    Type: AWS::AppIntegrations::Application
+    Properties:
+      Name: WiseCalls Customer Location
+      Namespace: !Ref ApplicationNamespace
+      Description: Contact-scoped display of consented short-lived customer GPS.
+      ApplicationType: STANDARD
+      ApplicationSourceConfig:
+        ExternalUrlConfig:
+          AccessUrl: !Sub "https://${AgentMapDistribution.DomainName}/"
+      ApplicationConfig:
+        ContactHandling:
+          Scope: PER_CONTACT
+      Tags:
+        - { Key: Project, Value: !Ref ProjectName }
+        - { Key: Environment, Value: !Ref Environment }
+
+  AgentWorkspaceApplicationAssociation:
+    Type: AWS::Connect::IntegrationAssociation
+    Properties:
+      InstanceId: !Ref ConnectInstanceArn
+      IntegrationType: APPLICATION
+      IntegrationArn: !GetAtt AgentWorkspaceApplication.ApplicationArn
+
+Outputs:
+  AgentMapApiUrl:
+    Value: !Sub "https://${AgentMapApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/${Environment}/"
+  AgentMapBucketName:
+    Value: !Ref AgentMapBucket
+  AgentMapDistributionId:
+    Value: !Ref AgentMapDistribution
+  AgentMapUrl:
+    Value: !Sub "https://${AgentMapDistribution.DomainName}/"
+  AgentMapApiKeyName:
+    Value: !Ref AgentMapApiKey
+  AgentWorkspaceApplicationArn:
+    Value: !GetAtt AgentWorkspaceApplication.ApplicationArn
+  AgentWorkspaceApplicationNamespace:
+    Value: !Ref ApplicationNamespace
+  AgentWorkspaceAssociationId:
+    Value: !GetAtt AgentWorkspaceApplicationAssociation.IntegrationAssociationId
